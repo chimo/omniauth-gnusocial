@@ -3,11 +3,11 @@ require 'json'
 
 module OmniAuth
   module Strategies
-    class Twitter < OmniAuth::Strategies::OAuth
-      option :name, 'twitter'
+    class GNUsocial < OmniAuth::Strategies::OAuth
+      option :name, 'gnusocial'
 
-      option :client_options, {:authorize_path => '/oauth/authenticate',
-                               :site => 'https://api.twitter.com',
+      option :client_options, {:authorize_path => '/oauth/authorize',
+                               :site => 'https://sn.chromic.org/api',
                                :proxy => ENV['http_proxy'] ? URI(ENV['http_proxy']) : nil}
 
       uid { access_token.params[:user_id] }
@@ -22,7 +22,7 @@ module OmniAuth
           :description => raw_info['description'],
           :urls => {
             'Website' => raw_info['url'],
-            'Twitter' => "https://twitter.com/#{raw_info['screen_name']}",
+            'GNUsocial' => "https://sn.chromic.org/#{raw_info['screen_name']}",
           }
         }
       end
@@ -32,7 +32,7 @@ module OmniAuth
       end
 
       def raw_info
-        @raw_info ||= JSON.load(access_token.get('/1.1/account/verify_credentials.json?include_entities=false&skip_status=true&include_email=true').body)
+        @raw_info ||= JSON.load(access_token.get('/account/verify_credentials.json').body)
       rescue ::Errno::ETIMEDOUT
         raise ::Timeout::Error
       end
@@ -100,3 +100,5 @@ module OmniAuth
     end
   end
 end
+
+OmniAuth.config.add_camelization 'gnusocial', 'GNUsocial'

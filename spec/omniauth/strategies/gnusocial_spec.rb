@@ -1,11 +1,11 @@
 require 'spec_helper'
 
-describe OmniAuth::Strategies::Twitter do
+describe OmniAuth::Strategies::GNUsocial do
   let(:request) { double('Request', :params => {}, :cookies => {}, :env => {}) }
 
   subject do
     args = ['appid', 'secret', @options || {}].compact
-    OmniAuth::Strategies::Twitter.new(*args).tap do |strategy|
+    OmniAuth::Strategies::GNUsocial.new(*args).tap do |strategy|
       allow(strategy).to receive(:request) {
         request
       }
@@ -14,15 +14,15 @@ describe OmniAuth::Strategies::Twitter do
 
   describe 'client options' do
     it 'should have correct name' do
-      expect(subject.options.name).to eq('twitter')
+      expect(subject.options.name).to eq('gnusocial')
     end
 
     it 'should have correct site' do
-      expect(subject.options.client_options.site).to eq('https://api.twitter.com')
+        expect(subject.options.client_options.site).to eq('https://sn.chromic.org/api')
     end
 
     it 'should have correct authorize url' do
-      expect(subject.options.client_options.authorize_path).to eq('/oauth/authenticate')
+      expect(subject.options.client_options.authorize_path).to eq('/oauth/authorize')
     end
   end
 
@@ -53,7 +53,7 @@ describe OmniAuth::Strategies::Twitter do
 
     it 'should returns the urls' do
       expect(subject.info[:urls]['Website']).to eq(raw_info_hash['url'])
-      expect(subject.info[:urls]['Twitter']).to eq("https://twitter.com/#{raw_info_hash['screen_name']}")
+      expect(subject.info[:urls]['GNUsocial']).to eq("https://sn.chromic.org/#{raw_info_hash['screen_name']}")
     end
   end
 
