@@ -4,11 +4,20 @@ require 'json'
 module OmniAuth
   module Strategies
     class GNUsocial < OmniAuth::Strategies::OAuth
-      option :name, 'gnusocial'
 
-      option :client_options, {:authorize_path => '/oauth/authorize',
-                               :site => 'https://sn.chromic.org/api',
-                               :proxy => ENV['http_proxy'] ? URI(ENV['http_proxy']) : nil}
+      # I'm probably doing this very wrong...
+      # I need to learn ruby at some point.
+      def initialize(app, *args, &block)
+        super
+
+        @server = @options.server
+
+        options[:client_options] = {:authorize_path => '/oauth/authorize',
+                                 :site => "#{@server}/api",
+                                 :proxy => ENV['http_proxy'] ? URI(ENV['http_proxy']) : nil}
+      end
+
+      option :name, 'gnusocial'
 
       uid { access_token.params[:user_id] }
 
@@ -22,7 +31,7 @@ module OmniAuth
           :description => raw_info['description'],
           :urls => {
             'Website' => raw_info['url'],
-            'GNUsocial' => "https://sn.chromic.org/#{raw_info['screen_name']}",
+            'GNUsocial' => "#{options.server}/#{raw_info['screen_name']}",
           }
         }
       end
